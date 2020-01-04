@@ -79,6 +79,13 @@ class Tic_tac_toe():
                 return 1
         return 0
 
+    def check_draw(self):
+        for row in self.data:
+            for col in row:
+                if col == ' ':
+                    return 0
+        return 1
+
     def player_one(self):
         done = 0
         while done == 0:
@@ -130,11 +137,11 @@ class Tic_tac_toe():
                     self.data[2][2] = 'O'
                     done = 1
 
-    def random_opp(self):
+    def random_opp(self, i):
         done = 0
         while done == 0:
-            if self.winner != ' ':
-                done = 1
+            if self.winner != ' ' or i == 8:
+                done = 1 
             row = random.randint(0, 2)
             col = random.randint(0, 2)
             if self.data[row][col] == ' ':
@@ -147,15 +154,21 @@ class Tic_tac_toe():
             #for (j, col) in enumerate(row):
                 #self.data[i][j] = random.choice(['X', 'O'])
                 #print(i, j, col)
+        turn = 0
 
         while True:
             self.clock.tick(config.FPS)
 
             self.board()
             pygame.display.update()
+
             if self.winner != ' ':
                 print('The winner is', self.winner)
                 sys.exit(0)
+
+            if self.check_draw() == 1:
+                print('Draw!')
+
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
@@ -163,9 +176,13 @@ class Tic_tac_toe():
                     sys.exit(0)
 
             self.player_one()
+            turn += 1
+            print(turn)
             if self.check_victor() == 1 and self.winner == ' ':
                 self.winner = 'O'
-            self.random_opp()
+            self.random_opp(turn)
+            turn += 1
+            print(turn)
             if self.check_victor() == 1 and self.winner == ' ':
                 self.winner = 'X'
             
