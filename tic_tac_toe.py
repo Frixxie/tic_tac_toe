@@ -140,7 +140,7 @@ class Tic_tac_toe():
     def random_opp(self, i):
         done = 0
         while done == 0:
-            if self.winner != ' ' or i == 8:
+            if self.winner != ' ' or i == 8 or i == 9:
                 done = 1 
             row = random.randint(0, 2)
             col = random.randint(0, 2)
@@ -177,12 +177,13 @@ class Tic_tac_toe():
 
             self.player_one()
             turn += 1
-            print(turn)
+            print(turn, self.winner)
             if self.check_victor() == 1 and self.winner == ' ':
                 self.winner = 'O'
+
             self.random_opp(turn)
             turn += 1
-            print(turn)
+            print(turn, self.winner)
             if self.check_victor() == 1 and self.winner == ' ':
                 self.winner = 'X'
             
