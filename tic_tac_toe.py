@@ -103,7 +103,6 @@ class Tic_tac_toe():
                 if self.data[0][0] == ' ':
                     self.data[0][0] = 'O'
                     done = 1
-                    print('kake')
             if keys[pygame.K_2]:
                 if self.data[0][1] == ' ':
                     self.data[0][1] = 'O'
