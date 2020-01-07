@@ -172,11 +172,15 @@ class Tic_tac_toe():
                         move = (i, j)
         self.data[move[0]][move[1]] = 'X'
 
+    def print_evaluation(self, level):
+        print("|", sep=' ', end=' ')
+        for i in range(level):
+            print("-", end =' ')
+        print(self.scores[self.winner] + level, self.winner)
+
     def minimax(self, depth, is_maximizing):
         if self.check_victor() == 1 or self.check_draw() == 1:
-            print(self.data, self.scores[self.winner] + depth, self.winner)
-            if is_maximizing:
-                return self.scores[self.winner] - depth
+            self.print_evaluation(depth)
             return self.scores[self.winner] + depth
         if is_maximizing:
             best_score = -inf
