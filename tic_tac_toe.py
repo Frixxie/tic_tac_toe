@@ -7,6 +7,7 @@ import sys
 import numpy as np
 import pygame
 import config
+from math import inf
 
 class Tic_tac_toe():
     """
@@ -27,6 +28,9 @@ class Tic_tac_toe():
                        (2, 0):(round(config.SCREEN_X / 6), round(config.SCREEN_Y / 6 * 5)),
                        (2, 1):(round(config.SCREEN_X / 2), round(config.SCREEN_Y / 6 * 5)),
                        (2, 2):(round(config.SCREEN_X / 6 * 5), round(config.SCREEN_Y / 6 * 5))}
+        self.scores = {'X': -10,
+                       'O': 10,
+                       'draw': 0}
         self.winner = ' '
 
     def board(self):
@@ -63,20 +67,27 @@ class Tic_tac_toe():
             if (self.data[0][0] == self.data[0][1] == self.data[0][2] or
                     self.data[0][0] == self.data[1][0] == self.data[2][0] or
                     self.data[0][0] == self.data[1][1] == self.data[2][2]):
+                self.winner = self.data[0][0]
                 return 1
         if self.data[1][0] != ' ':
             if self.data[1][0] == self.data[1][1] == self.data[1][2]:
+                self.winner = self.data[1][0]
                 return 1
         if self.data[2][0] != ' ':
             if (self.data[2][0] == self.data[2][1] == self.data[2][2] or
                     self.data[2][0] == self.data[1][1] == self.data[0][2]):
+                self.winner = self.data[2][0]
                 return 1
         if self.data[0][1] != ' ':
             if self.data[0][1] == self.data[1][1] == self.data[2][1]:
+                self.winner = self.data[0][1]
                 return 1
         if self.data[0][2] != ' ':
             if self.data[0][2] == self.data[1][2] == self.data[2][2]:
+                self.winner = self.data[0][2]
                 return 1
+        if self.check_draw() == 1:
+            self.winner = 'draw'
         return 0
 
     def check_draw(self):
@@ -140,13 +151,56 @@ class Tic_tac_toe():
         done = 0
         while done == 0:
             if self.winner != ' ' or i == 8 or i == 9:
-                done = 1 
+                done = 1
             row = random.randint(0, 2)
             col = random.randint(0, 2)
             if self.data[row][col] == ' ':
-                self.data[row][col] = 'X'
+                self.data[row][col] = 'O'
                 done = 1
 
+    def optimized_opp(self):
+        best_score = inf
+        for (i, row) in enumerate(self.data):
+            for (j, col) in enumerate(row):
+                if col == ' ':
+                    self.data[i][j] = 'X'
+                    score = self.minimax(0, True)
+                    self.winner = ' '
+                    self.data[i][j] = ' '
+                    if score < best_score:
+                        best_score = score
+                        move = (i, j)
+        self.data[move[0]][move[1]] = 'X'
+
+    def minimax(self, depth, is_maximizing):
+        if self.check_victor() == 1 or self.check_draw() == 1:
+            print(self.data, self.scores[self.winner] + depth, self.winner)
+            if is_maximizing:
+                return self.scores[self.winner] - depth
+            return self.scores[self.winner] + depth
+        if is_maximizing:
+            best_score = -inf
+            for (i, row) in enumerate(self.data):
+                for (j, col) in enumerate(row):
+                    if col == ' ':
+                        self.data[i][j] = 'O'
+                        score = self.minimax(depth + 1, False)
+                        self.winner = ' '
+                        self.data[i][j] = ' '
+                        best_score = max(score, best_score)
+            return best_score
+        else:
+            best_score = inf
+            for (i, row) in enumerate(self.data):
+                for (j, col) in enumerate(row):
+                    if col == ' ':
+                        self.data[i][j] = 'X'
+                        score = self.minimax(depth + 1, True)
+                        self.winner = ' '
+                        self.data[i][j] = ' '
+                        best_score = min(score, best_score)
+            return best_score
+        
 
     def run(self):
         #for (i, row) in enumerate(self.data):
@@ -161,6 +215,7 @@ class Tic_tac_toe():
             self.board()
             pygame.display.update()
 
+            print(self.winner)
             if self.winner != ' ':
                 print('The winner is', self.winner)
                 sys.exit(0)
@@ -175,17 +230,21 @@ class Tic_tac_toe():
                     sys.exit(0)
 
             self.player_one()
+            self.check_victor()
             turn += 1
-            print(turn, self.winner)
-            if self.check_victor() == 1 and self.winner == ' ':
-                self.winner = 'O'
-
-            self.random_opp(turn)
-            turn += 1
-            print(turn, self.winner)
-            if self.check_victor() == 1 and self.winner == ' ':
-                self.winner = 'X'
             
+            if self.check_draw() == 1:
+                print('Draw!')
+                sys.exit(0)
+            if self.winner != ' ':
+                print('The winner is', self.winner)
+                sys.exit(0)
+
+
+            self.optimized_opp()
+            self.check_victor()
+            turn += 1
+
 
 if __name__ == '__main__':
     Tic_tac_toe().run()
