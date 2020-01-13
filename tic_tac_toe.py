@@ -28,9 +28,10 @@ class Tic_tac_toe():
                        (2, 0):(round(config.SCREEN_X / 6), round(config.SCREEN_Y / 6 * 5)),
                        (2, 1):(round(config.SCREEN_X / 2), round(config.SCREEN_Y / 6 * 5)),
                        (2, 2):(round(config.SCREEN_X / 6 * 5), round(config.SCREEN_Y / 6 * 5))}
-        self.scores = {'X': -10,
+        self.scores = {'X': 0,
                        'O': 10,
-                       'draw': 0}
+                       'draw': 0,
+                       ' ': 0}
         self.winner = ' '
 
     def board(self):
@@ -164,23 +165,24 @@ class Tic_tac_toe():
             for (j, col) in enumerate(row):
                 if col == ' ':
                     self.data[i][j] = 'X'
-                    score = self.minimax(0, True)
+                    score = self.minimax(0, True, (i, j))
                     self.winner = ' '
                     self.data[i][j] = ' '
                     if score < best_score:
                         best_score = score
                         move = (i, j)
+        print(move, best_score)
         self.data[move[0]][move[1]] = 'X'
 
-    def print_evaluation(self, level):
+    def print_evaluation(self, level, move):
         print("|", sep=' ', end=' ')
         for i in range(level):
             print("-", end =' ')
-        print(self.scores[self.winner] + level, self.winner)
+        print(self.scores[self.winner] + level, self.winner, move)
 
-    def minimax(self, depth, is_maximizing):
+    def minimax(self, depth, is_maximizing, move):
         if self.check_victor() == 1 or self.check_draw() == 1:
-            self.print_evaluation(depth)
+            #self.print_evaluation(depth, move)
             return self.scores[self.winner] + depth
         if is_maximizing:
             best_score = -inf
@@ -188,7 +190,7 @@ class Tic_tac_toe():
                 for (j, col) in enumerate(row):
                     if col == ' ':
                         self.data[i][j] = 'O'
-                        score = self.minimax(depth + 1, False)
+                        score = self.minimax(depth + 1, False, (i, j))
                         self.winner = ' '
                         self.data[i][j] = ' '
                         best_score = max(score, best_score)
@@ -199,7 +201,7 @@ class Tic_tac_toe():
                 for (j, col) in enumerate(row):
                     if col == ' ':
                         self.data[i][j] = 'X'
-                        score = self.minimax(depth + 1, True)
+                        score = self.minimax(depth + 1, True, (i, j))
                         self.winner = ' '
                         self.data[i][j] = ' '
                         best_score = min(score, best_score)
@@ -234,13 +236,16 @@ class Tic_tac_toe():
                     sys.exit(0)
 
             self.player_one()
+            #self.random_opp(turn)
             self.check_victor()
             turn += 1
             
             if self.check_draw() == 1:
+                self.board()
                 print('Draw!')
                 sys.exit(0)
             if self.winner != ' ':
+                self.board()
                 print('The winner is', self.winner)
                 sys.exit(0)
 
